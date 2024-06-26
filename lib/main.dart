@@ -1,21 +1,18 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
-import 'package:meteo/models/GeoLocation.dart';
-
+import 'package:meteo/models/geo-location-model.dart';
+import 'package:meteo/models/weather-details-model.dart';
+import 'package:meteo/services/geo-location-service.dart';
+import 'package:meteo/services/weather-details-service.dart';
 
 Future main() async {
   await dotenv.load(fileName: ".env");
-
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -34,37 +31,19 @@ class MyHomePage extends StatefulWidget {
 
   final String title;
 
-
-
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
   late Future<Geolocation> geoLoc;
-
-  Map<String, String> requestHeaders = {
-    'Content-type': 'application/json',
-    'Accept': 'application/json',
-    'X-Api-Key': 'b0xNipXHc7QidOPhDcuGOg==PZ7OUWlS1DZN3KcI'
-  };
-
-  Future<Geolocation> fetchGeoLoc() async {
-    final response = await http.get(Uri.parse('https://api.api-ninjas.com/v1/geocoding?city=London&country=England'), headers: requestHeaders);
-
-    if (response.statusCode == 200) {
-      List<dynamic> data = jsonDecode(response.body);
-      return Geolocation.fromJson(data[0] as Map<String, dynamic>);
-    } else {
-      throw Exception('Failed to load GeoLocation');
-    }
-  }
-
+  late Future<WeatherDetails> weatherDetails;
 
   @override
   void initState() {
     super.initState();
-    geoLoc = fetchGeoLoc();
+    geoLoc = GeoLocationService.fetchGeoLoc();
+    weatherDetails = WeatherDetailsService.fetchWeatherDetails();
   }
 
   @override
@@ -80,18 +59,35 @@ class _MyHomePageState extends State<MyHomePage> {
           children: <Widget>[
             FutureBuilder<Geolocation>(
               future: geoLoc,
-              builder: (context, snapshot){
+              builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   return Column(
                     children: [
                       Text(snapshot.data!.name),
                       Text(snapshot.data!.country),
                       Text(snapshot.data!.state),
-                      Text( snapshot.data!.longitude.toString() ),
-                      Text( snapshot.data!.latitude.toString() ),
+                      Text(snapshot.data!.longitude.toString()),
+                      Text(snapshot.data!.latitude.toString()),
                     ],
                   );
-                    Text(snapshot.data!.name);
+                } else if (snapshot.hasError) {
+                  return Text('${snapshot.error}');
+                }
+
+                // Spinner
+                return const CircularProgressIndicator();
+              },
+            ),
+            FutureBuilder<WeatherDetails>(
+              future: weatherDetails,
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return Column(
+                    children: [
+                      Text(snapshot.data!.name),
+                      Text(snapshot.data!.base),
+                    ],
+                  );
                 } else if (snapshot.hasError) {
                   return Text('${snapshot.error}');
                 }
@@ -100,7 +96,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 return const CircularProgressIndicator();
               },
             )
-
           ],
         ),
       ),

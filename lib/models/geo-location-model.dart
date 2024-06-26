@@ -1,4 +1,3 @@
-
 class Geolocation {
   final String name;
   final double latitude;
@@ -23,24 +22,23 @@ class Geolocation {
     );
   }
 
-  //
-  // factory Geolocation.fromJson(Map<String, dynamic> json){
-  //   return switch (json){
-  //     {
-  //     'name': String name,
-  //     'latitude': double latitude,
-  //     'longitude': double longitude,
-  //     'country': String country,
-  //     'state': String state
-  //     } =>
-  //         Geolocation(
-  //           name: name,
-  //           latitude: latitude,
-  //           longitude: longitude,
-  //           country: country,
-  //           state: state,
-  //         ), _ => throw const FormatException('Failed to load GeoLocation')
-  //   };
-  // }
-
+//
+// factory Geolocation.fromJson(Map<String, dynamic> json){
+//   return switch (json){
+//     {
+//     'name': String name,
+//     'latitude': double latitude,
+//     'longitude': double longitude,
+//     'country': String country,
+//     'state': String state
+//     } =>
+//         Geolocation(
+//           name: name,
+//           latitude: latitude,
+//           longitude: longitude,
+//           country: country,
+//           state: state,
+//         ), _ => throw const FormatException('Failed to load GeoLocation')
+//   };
+// }
 }
