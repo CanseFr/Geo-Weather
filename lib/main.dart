@@ -124,7 +124,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Supabase Flutter',
+      title: 'World Discover',
       theme: ThemeData.dark().copyWith(
         primaryColor: Colors.green,
         textButtonTheme: TextButtonThemeData(
@@ -146,6 +146,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+// Gestion erreur login a deplacer dans plus tard
 extension ContextExtension on BuildContext {
   void showSnackBar(String message, {bool isError = false}) {
     ScaffoldMessenger.of(this).showSnackBar(
