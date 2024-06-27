@@ -160,16 +160,20 @@
 //   }
 // }
 
-
-
 import 'package:flutter/material.dart';
-import 'package:meteo/pages/account_page.dart';
 import 'package:meteo/pages/home_page.dart';
-import 'package:meteo/pages/login_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
+
+  // TODO: FIX ENV
+  // await dotenv.load(fileName: ".env");
+  // final String? URL_BAISE = dotenv.env['URL_SUPERBAISE'];
+  // final String? ANON_KEY = dotenv.env['ANON_KEY'];
+
   await Supabase.initialize(
+    // url: URL_BAISE!,
+    // anonKey: ANON_KEY!,
     url: 'https://uuaxmgxynftomlmbhtpd.supabase.co',
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1YXhtZ3h5bmZ0b21sbWJodHBkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTk0NzQ0NTEsImV4cCI6MjAzNTA1MDQ1MX0.MUlpnQXh8C4lu1diYj26QkdsLzlo6LlQna6U-UuTJoY',
   );
