@@ -55,10 +55,14 @@ class _WeatherPageState extends State<WeatherPage> {
 
       setState(() {
         weatherDetails = Future.value(newWeatherDetails);
+        _specificCityController.clear();
+        _specificCountryController.clear();
       });
+
     } catch (error) {
       print('Error fetching weather data: $error');
     }
+
   }
 
   Future<void> _getUserLocation() async {
