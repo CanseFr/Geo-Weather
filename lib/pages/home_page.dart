@@ -17,7 +17,6 @@ class HomePage extends StatefulWidget {
   @override
   State<HomePage> createState() => _HomePageState();
 }
-
 class _HomePageState extends State<HomePage> {
   late final TextEditingController _emailController = TextEditingController();
   late final StreamSubscription<AuthState> _authStateSubscription;
@@ -55,43 +54,87 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: const Text('World Discover'),
       ),
-      body: Center(
+      body: Padding(
+        padding: EdgeInsets.all(10),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            ElevatedButton(
-              onPressed: () {
-                if (_session == null) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => LoginPage()),
-                  );
-                } else {
-                  _handleSignOut();
-                }
-              },
-              child: Text(_buttonText),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+
+                // LOGIN & LOGOUT
+
+                ElevatedButton(
+                  onPressed: () {
+                    if (_session == null) {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => LoginPage()),
+                      );
+                    } else {
+                      _handleSignOut();
+                    }
+                  },
+                  child: Text(_buttonText),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor:
+                    _session == null ? Colors.white : Colors.red,
+                  ),
+                ),
+
+                // Option
+
+                IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => AccountPage()),
+                    );
+                  },
+                  icon: Icon(Icons.settings),
+                  tooltip: 'Paramètres',
+                ),
+              ],
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AccountPage()),
-                );
-              },
-              child: const Text('Parametres'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                print('Geolocation button pressed');
-              },
-              child: const Text('Geolocation'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                print('Weather button pressed');
-              },
-              child: const Text('Weather'),
+
+            // App
+
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+
+                  // GEO LOC
+                  Image.asset(
+                    'google-maps.png',
+                    width: 100,
+                    height: 100,
+                  ),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      print('Geolocation button pressed');
+                    },
+                    child: const Text('Geolocation'),
+                  ),
+
+                  // METEO
+                  SizedBox(height: 16),
+                  Image.asset(
+                    'la-meteo.png',
+                    width: 100,
+                    height: 100,
+                  ),
+                  SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: () {
+                      print('Weather button pressed');
+                    },
+                    child: const Text('Weather'),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
