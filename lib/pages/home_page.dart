@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:meteo/pages/geoloc_page.dart';
 import 'package:meteo/pages/login_page.dart';
+import 'package:meteo/pages/weather_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../main.dart';
@@ -52,10 +54,14 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('World Discover'),
+        title:  Image.asset(
+          'logo-home.png',
+          width: 50,
+          height: 50,
+        ),
       ),
       body: Padding(
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.all(50),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -115,6 +121,9 @@ class _HomePageState extends State<HomePage> {
                   // Bouton Geolocation
                   Column(
                     children: [
+
+                      // GEO APP
+
                       Image.asset(
                         'google-maps.png',
                         width: 100,
@@ -123,7 +132,10 @@ class _HomePageState extends State<HomePage> {
                       SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: () {
-                          print('Geolocation button pressed');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => GeolocPage()),
+                          );
                         },
                         child: const Text('Geolocation'),
                       ),
@@ -133,6 +145,9 @@ class _HomePageState extends State<HomePage> {
                   // Bouton Weather
                   Column(
                     children: [
+
+                      // WEATHER APP
+
                       Image.asset(
                         'la-meteo.png',
                         width: 100,
@@ -141,7 +156,10 @@ class _HomePageState extends State<HomePage> {
                       SizedBox(height: 16),
                       ElevatedButton(
                         onPressed: () {
-                          print('Weather button pressed');
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => WeatherPage()),
+                          );
                         },
                         child: const Text('Weather'),
                       ),
