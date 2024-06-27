@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> {
                   child: Text(_buttonText),
                   style: ElevatedButton.styleFrom(
                     backgroundColor:
-                    _session == null ? Colors.white : Colors.red,
+                    _session == null ? Colors.blue : Colors.red,
                   ),
                 ),
 
@@ -101,37 +101,51 @@ class _HomePageState extends State<HomePage> {
             // App
 
             Expanded(
-              child: Column(
+              child: _session == null
+                  ? Center(
+                child: Text(
+                  'Veuillez vous identifier pour utiliser l\'application',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 18),
+                ),
+              )
+                  : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-
-                  // GEO LOC
-                  Image.asset(
-                    'google-maps.png',
-                    width: 100,
-                    height: 100,
+                  // Bouton Geolocation
+                  Column(
+                    children: [
+                      Image.asset(
+                        'google-maps.png',
+                        width: 100,
+                        height: 100,
+                      ),
+                      SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          print('Geolocation button pressed');
+                        },
+                        child: const Text('Geolocation'),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      print('Geolocation button pressed');
-                    },
-                    child: const Text('Geolocation'),
-                  ),
-
-                  // METEO
-                  SizedBox(height: 16),
-                  Image.asset(
-                    'la-meteo.png',
-                    width: 100,
-                    height: 100,
-                  ),
-                  SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      print('Weather button pressed');
-                    },
-                    child: const Text('Weather'),
+                  SizedBox(height: 20),
+                  // Bouton Weather
+                  Column(
+                    children: [
+                      Image.asset(
+                        'la-meteo.png',
+                        width: 100,
+                        height: 100,
+                      ),
+                      SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: () {
+                          print('Weather button pressed');
+                        },
+                        child: const Text('Weather'),
+                      ),
+                    ],
                   ),
                 ],
               ),
