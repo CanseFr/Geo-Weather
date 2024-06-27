@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:meteo/models/geo-location-model.dart';
 
 class GeoLocationService {
-  static Future<Geolocation> fetchGeoLoc() async {
+  static Future<Geolocation> fetchGeoLoc(String city,String country) async {
     Map<String, String> requestHeaders = {
       'Content-type': 'application/json',
       'Accept': 'application/json',
@@ -11,7 +11,7 @@ class GeoLocationService {
     };
     final response = await http.get(
         Uri.parse(
-            'https://api.api-ninjas.com/v1/geocoding?city=London&country=England'),
+            'https://api.api-ninjas.com/v1/geocoding?city='+city+'&country=' + country),
         headers: requestHeaders);
 
     if (response.statusCode == 200) {

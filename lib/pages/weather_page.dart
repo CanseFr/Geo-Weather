@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:meteo/services/traduction-weather.dart';
 
+import '../models/geo-location-model.dart';
 import '../models/weather-details-model.dart';
+import '../services/geo-location-service.dart';
 import '../services/weather-details-service.dart';
 
 class WeatherPage extends StatefulWidget {
@@ -14,20 +16,24 @@ class WeatherPage extends StatefulWidget {
 }
 
 class _WeatherPageState extends State<WeatherPage> {
-
   // POS
-  String? _latitude;
-  String? _longitude;
+  double? _latitude;
+  double? _longitude;
 
   // INPUT
   TextEditingController _specificCityController = TextEditingController();
+  TextEditingController _specificCountryController = TextEditingController();
 
+  // GEO
+  late Future<Geolocation> geoLoc;
+
+  // WEATHER
   late Future<WeatherDetails> weatherDetails;
 
   @override
   void initState() {
     super.initState();
-    _getLocation().then((_) {
+    _getUserLocation().then((_) {
       weatherDetails =
           WeatherDetailsService.fetchWeatherDetails(_longitude!, _latitude!);
     });
@@ -35,24 +41,37 @@ class _WeatherPageState extends State<WeatherPage> {
 
   Future<void> _getSpecificLocation() async {
     String city = _specificCityController.text;
-    print('City entered: $city');
+    String country = _specificCountryController.text;
 
+    try {
+      Geolocation geoLocation =
+          await GeoLocationService.fetchGeoLoc(city, country);
 
+      WeatherDetails newWeatherDetails =
+          await WeatherDetailsService.fetchWeatherDetails(
+        geoLocation.longitude as double,
+        geoLocation.latitude as double,
+      );
 
+      setState(() {
+        weatherDetails = Future.value(newWeatherDetails);
+      });
+    } catch (error) {
+      print('Error fetching weather data: $error');
+    }
   }
 
-  Future<void> _getLocation() async {
+  Future<void> _getUserLocation() async {
     bool serviceEnabled;
     LocationPermission permission;
 
-
-    // Loca activé ?
+    // Loca
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
       return Future.error('Location services are disabled.');
     }
 
-    // Autoriz accés
+    // Aut accés
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.deniedForever) {
       return Future.error(
@@ -73,16 +92,20 @@ class _WeatherPageState extends State<WeatherPage> {
         desiredAccuracy: LocationAccuracy.high);
 
     setState(() {
-      _latitude = position.latitude.toString();
-      _longitude = position.longitude.toString();
+      _latitude = position.latitude;
+      _longitude = position.longitude;
     });
   }
 
-
+  @override
+  void dispose() {
+    _specificCityController.dispose();
+    _specificCountryController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       appBar: AppBar(title: const Text('Weather')),
       body: Padding(
@@ -187,20 +210,35 @@ class _WeatherPageState extends State<WeatherPage> {
               Padding(
                 padding: EdgeInsets.all(30),
                 child: ElevatedButton(
-                  onPressed: _getLocation,
+                  onPressed: _getUserLocation,
                   child: const Text('Ma position'),
                 ),
               ),
 
-
               // GET A LOC
+
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                child: TextFormField(
+                  controller: _specificCountryController,
+                  decoration: InputDecoration(
+                    labelText: 'Pays',
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 18),
+
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: TextFormField(
                   controller: _specificCityController,
                   decoration: InputDecoration(
-                    labelText: 'City',
-                    contentPadding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
+                    labelText: 'Ville',
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
                   ),
                 ),
               ),
@@ -216,7 +254,6 @@ class _WeatherPageState extends State<WeatherPage> {
               ),
 
               const SizedBox(height: 18),
-
             ],
           ),
         ),
