@@ -28,7 +28,7 @@ class _AccountPageState extends State<AccountPage> {
       final userId = supabase.auth.currentSession!.user.id;
       final data =
       await supabase.from('profiles').select().eq('id', userId).single();
-      _usernameController.text = (data['username'] ?? '') as String;
+      _usernameController.text = (data['user'] ?? '') as String;
       _websiteController.text = (data['website'] ?? '') as String;
       _avatarUrl = (data['avatar_url'] ?? '') as String;
     } on PostgrestException catch (error) {
