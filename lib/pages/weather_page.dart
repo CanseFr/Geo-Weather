@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:meteo/services/traduction-weather.dart';
 
 import '../models/weather-details-model.dart';
 import '../services/weather-details-service.dart';
@@ -72,37 +73,87 @@ class _WeatherPageState extends State<WeatherPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-
-            // BTN GET LOC
+            // Bouton pour obtenir la localisation
             ElevatedButton(
               onPressed: _getLocation,
-              child: Text('Get Location'),
+              child: const Text('Get Location'),
             ),
             const SizedBox(height: 20),
+            // FutureBuilder pour afficher les détails météo
             FutureBuilder<WeatherDetails>(
               future: weatherDetails,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(child: CircularProgressIndicator());
+                  return const Center(child: CircularProgressIndicator());
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (snapshot.hasData) {
-
-                  // DISPLAY INFO
+                  // Affichage des informations météo
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [                   Image.asset(
-                      'meteo-ico/' + snapshot.data!.weatherList[0].icon +'.png',
-                      width: 100,
-                      height: 100,
-                    ),
-                      Text('Latitude: $_latitude, Longitude: $_longitude'),
-                      const SizedBox(height: 10),
-                      Text('Ville: ${snapshot.data!.name}'),
+                    children: [
+
+                      // Ico
+                      Image.asset(
+                        'meteo-ico/${snapshot.data!.weatherList[0].icon}.png',
+                        width: 100,
+                        height: 100,
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Ville
+                      Text(
+                        '${snapshot.data!.name}',
+                        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(height: 8),
+
+                      // ETAT
+                      Text(
+                        '${TraductionWeather.traductWeather(snapshot.data!.weatherList[0].description)}',
+                        style: const TextStyle(fontSize: 18),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // TEMP
+                      Row(
+                        children: [
+                          const Icon(Icons.thermostat_outlined, size: 24),
+                          const SizedBox(width: 8),
+                          Text(
+                            '${TraductionWeather.kelvinToCelsius(snapshot.data!.main.temp)} °C',
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      // Humidité
+                      Row(
+                        children: [
+                          const Icon(Icons.water_outlined, size: 24),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Humidity: ${snapshot.data!.main.humidity}%',
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      // Pression atmosphérique
+                      Row(
+                        children: [
+                          // const Icon(Icons.barometer_outlined, size: 24),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Pressure: ${snapshot.data!.main.pressure} hPa',
+                            style: const TextStyle(fontSize: 18),
+                          ),
+                        ],
+                      ),
                     ],
                   );
                 } else {
-                  return Center(child: Text('No data available'));
+                  return const Center(child: Text('No data available'));
                 }
               },
             ),
