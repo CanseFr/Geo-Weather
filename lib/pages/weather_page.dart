@@ -91,7 +91,11 @@ class _WeatherPageState extends State<WeatherPage> {
                   // DISPLAY INFO
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
+                    children: [                   Image.asset(
+                      'meteo-ico/' + snapshot.data!.weatherList[0].icon +'.png',
+                      width: 100,
+                      height: 100,
+                    ),
                       Text('Latitude: $_latitude, Longitude: $_longitude'),
                       const SizedBox(height: 10),
                       Text('Ville: ${snapshot.data!.name}'),

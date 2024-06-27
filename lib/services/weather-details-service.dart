@@ -6,6 +6,7 @@ final String API_KEY = '912ea2507df16681dfeac8634f83f4ff';
 // final String? API_KEY = dotenv.env['METEO_API_KEY'];
 
 class WeatherDetailsService {
+
   static Future<WeatherDetails> fetchWeatherDetails(String lon, String lat) async {
     final response = await http.get(Uri.parse(
         'https://api.openweathermap.org/data/2.5/weather?lat='+lat+'&lon='+lon+'&appid=' + API_KEY));
