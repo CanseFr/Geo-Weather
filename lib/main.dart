@@ -162,6 +162,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:meteo/pages/home_page.dart';
+import 'package:meteo/providers/favorit_cities.dart';
+import 'package:provider/provider.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 Future<void> main() async {
@@ -177,7 +179,11 @@ Future<void> main() async {
     url: 'https://uuaxmgxynftomlmbhtpd.supabase.co',
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InV1YXhtZ3h5bmZ0b21sbWJodHBkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTk0NzQ0NTEsImV4cCI6MjAzNTA1MDQ1MX0.MUlpnQXh8C4lu1diYj26QkdsLzlo6LlQna6U-UuTJoY',
   );
-  runApp(const MyApp());
+  runApp(
+      ChangeNotifierProvider(
+          create: (context)=>FavoritCities(),
+          child: const MyApp())
+  );
 }
 
 final supabase = Supabase.instance.client;

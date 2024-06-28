@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:provider/provider.dart';
 
 import '../models/geo-location-model.dart';
+import '../providers/favorit_cities.dart';
 import '../services/geo-location-service.dart';
 import '../services/request_status.dart';
 
@@ -18,9 +20,6 @@ class _GeolocPageState extends State<GeolocPage> {
   // POS
   double? _latitude;
   double? _longitude;
-
-  // LISTE CITY
-  List<Geolocation> geoList = [];
 
   // TITLE POS
   Geolocation? _cityName;
@@ -41,8 +40,8 @@ class _GeolocPageState extends State<GeolocPage> {
         _latitude = geoLocation.latitude as double;
         _longitude = geoLocation.longitude as double;
         _cityName = geoLocation;
-
       });
+
     } catch (error) {
       print('Error fetching weather data: $error');
     }
@@ -64,22 +63,6 @@ class _GeolocPageState extends State<GeolocPage> {
       print('Error fetching weather data: $error');
     }
 
-  }
-
-
-
-  void _addCityToPersonnalList(){
-    Geolocation newGeo = new Geolocation(name: "", latitude: 0, longitude: 0, country: _specificCountryController.text.toString(), state: _specificCityController.text.toString());
-
-    if(GeoLocationService.checkIfCityExist(geoList,newGeo) ){
-      // Do nothing
-    } else {
-      setState(() {
-        geoList.add(newGeo);
-      });
-    }
-
-    print(geoList.toString());
   }
 
   Future<void> _getUserLocationOnInit() async {
@@ -125,6 +108,10 @@ class _GeolocPageState extends State<GeolocPage> {
 
   @override
   Widget build(BuildContext context) {
+
+    // LISTE CITY
+    var geoList = Provider.of<FavoritCities>(context);
+
     return Scaffold(
       appBar: AppBar(
         title: Image.asset(
@@ -160,7 +147,7 @@ class _GeolocPageState extends State<GeolocPage> {
                         child: FlutterMap(
                           options: MapOptions(
                             initialCenter: LatLng(_latitude!, _longitude!),
-                            initialZoom: 13.0,
+                            initialZoom: 5.0,
                           ),
                           children: [
                             TileLayer(
@@ -170,6 +157,7 @@ class _GeolocPageState extends State<GeolocPage> {
                             ),
                             MarkerLayer(
                               markers: [
+                                // TODO: Rendre cette list dinamique avec selection de plsuieur ville ...
                                 Marker(
                                   width: 80.0,
                                   height: 80.0,
@@ -234,7 +222,13 @@ class _GeolocPageState extends State<GeolocPage> {
                       onPressed: () {
 
                         if (_specificCityController.text.isNotEmpty && _specificCountryController.text.isNotEmpty){
-                          _addCityToPersonnalList();
+                          Geolocation newGeo = new Geolocation(name: "", latitude: 0, longitude: 0, country: _specificCountryController.text.toString(), state: _specificCityController.text.toString());
+
+                          if(Provider.of<FavoritCities>(context, listen: false).contain(newGeo)){
+                            // Do nothing
+                          } else {
+                          Provider.of<FavoritCities>(context, listen: false).add(newGeo);
+                          }
                         }
 
                       },
@@ -254,8 +248,8 @@ class _GeolocPageState extends State<GeolocPage> {
                               title: const Text("Votre liste"),
                               content: SingleChildScrollView(
                                 child: ListBody(
-                                  children: geoList.isNotEmpty
-                                      ? geoList.map((geo) => StatefulBuilder(
+                                  children: geoList.items.isNotEmpty
+                                      ? geoList.items.map((geo) => StatefulBuilder(
                                     builder: (BuildContext context, StateSetter setState) {
                                       return GestureDetector(
                                         onTap: () {
@@ -273,6 +267,7 @@ class _GeolocPageState extends State<GeolocPage> {
                                               IconButton(
                                                 icon: const Icon(Icons.visibility, color: Colors.greenAccent,),
                                                 onPressed: () {
+                                                  Navigator.of(context).pop();
                                                   _getSpecificLocationbySelectList(geo);
                                                 },
                                               ),
@@ -280,7 +275,8 @@ class _GeolocPageState extends State<GeolocPage> {
                                                 icon: const Icon(Icons.delete, color: Colors.redAccent,),
                                                 onPressed: () {
                                                   setState(() {
-                                                    geoList.remove(geo);
+                                                    Navigator.of(context).pop();
+                                                    Provider.of<FavoritCities>(context, listen: false).remove(geo);
                                                   });
                                                 },
                                               ),
