@@ -17,8 +17,8 @@ class WeatherPage extends StatefulWidget {
 
 class _WeatherPageState extends State<WeatherPage> {
   // POS
-  double? _latitude;
-  double? _longitude;
+ double? _latitude;
+ double? _longitude;
 
   // INPUT
   TextEditingController _specificCityController = TextEditingController();
@@ -33,13 +33,14 @@ class _WeatherPageState extends State<WeatherPage> {
   @override
   void initState() {
     super.initState();
-    _getUserLocation().then((_) {
-      weatherDetails =
-          WeatherDetailsService.fetchWeatherDetails(_longitude!, _latitude!);
-    });
+
+
+
+    _getUserLocationOnInit();
+
   }
 
-  Future<void> _getSpecificLocation() async {
+  Future<void> _getSpecificLocationOnResearch() async {
     String city = _specificCityController.text;
     String country = _specificCountryController.text;
 
@@ -47,14 +48,9 @@ class _WeatherPageState extends State<WeatherPage> {
       Geolocation geoLocation =
           await GeoLocationService.fetchGeoLoc(city, country);
 
-      WeatherDetails newWeatherDetails =
-          await WeatherDetailsService.fetchWeatherDetails(
-        geoLocation.longitude as double,
-        geoLocation.latitude as double,
-      );
-
       setState(() {
-        weatherDetails = Future.value(newWeatherDetails);
+        _longitude = geoLocation.longitude as double;
+        _latitude = geoLocation.latitude as double;
         _specificCityController.clear();
         _specificCountryController.clear();
       });
@@ -65,7 +61,7 @@ class _WeatherPageState extends State<WeatherPage> {
 
   }
 
-  Future<void> _getUserLocation() async {
+  Future<void> _getUserLocationOnInit() async {
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -120,12 +116,15 @@ class _WeatherPageState extends State<WeatherPage> {
             children: <Widget>[
               const SizedBox(height: 20),
 
+              (_latitude != null && _longitude != null)?
+
               FutureBuilder<WeatherDetails>(
-                future: weatherDetails,
+                future: WeatherDetailsService.fetchWeatherDetails(_longitude!, _latitude!),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
+                    print("E1");
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else if (snapshot.hasData) {
                     // Affichage des informations météo centrées
@@ -208,13 +207,14 @@ class _WeatherPageState extends State<WeatherPage> {
                     return const Center(child: Text('No data available'));
                   }
                 },
-              ),
+              )
 
+              : const Center(child: CircularProgressIndicator()),
               // GET MY LOC
               Padding(
                 padding: EdgeInsets.all(30),
                 child: ElevatedButton(
-                  onPressed: _getUserLocation,
+                  onPressed: _getUserLocationOnInit,
                   child: const Text('Ma position'),
                 ),
               ),
@@ -252,7 +252,7 @@ class _WeatherPageState extends State<WeatherPage> {
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
                 child: ElevatedButton(
-                  onPressed: _getSpecificLocation,
+                  onPressed: _getSpecificLocationOnResearch,
                   child: Text('Autre localisation'),
                 ),
               ),
