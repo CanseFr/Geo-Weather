@@ -108,7 +108,7 @@ class _HomePageState extends State<HomePage> {
 
             Expanded(
               child: _session == null
-                  ? Center(
+                  ? const Center(
                 child: Text(
                   'Veuillez vous identifier pour utiliser l\'application',
                   textAlign: TextAlign.center,

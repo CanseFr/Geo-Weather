@@ -17,4 +17,5 @@ class WeatherDetailsService {
       throw Exception('Failed to load weather');
     }
   }
+
 }

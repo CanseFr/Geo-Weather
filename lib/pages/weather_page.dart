@@ -6,6 +6,7 @@ import 'package:meteo/services/traduction-weather.dart';
 import '../models/geo-location-model.dart';
 import '../models/weather-details-model.dart';
 import '../services/geo-location-service.dart';
+import '../services/request_status.dart';
 import '../services/weather-details-service.dart';
 
 class WeatherPage extends StatefulWidget {
@@ -33,11 +34,7 @@ class _WeatherPageState extends State<WeatherPage> {
   @override
   void initState() {
     super.initState();
-
-
-
     _getUserLocationOnInit();
-
   }
 
   Future<void> _getSpecificLocationOnResearch() async {
@@ -67,25 +64,12 @@ class _WeatherPageState extends State<WeatherPage> {
 
     // Loca
     serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return Future.error('Location services are disabled.');
-    }
+    RequestStatus.isLocationDisabled(!serviceEnabled);
 
     // Aut accés
     permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.deniedForever) {
-      return Future.error(
-          'Location permissions are permanently denied, we cannot request permissions.');
-    }
-
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission != LocationPermission.whileInUse &&
-          permission != LocationPermission.always) {
-        return Future.error(
-            'Location permissions are denied (actual value: $permission).');
-      }
-    }
+    RequestStatus.locationPermition(permission);
+    RequestStatus.permissionDenied(permission);
 
     // Actual Pos
     Position position = await Geolocator.getCurrentPosition(
@@ -107,7 +91,11 @@ class _WeatherPageState extends State<WeatherPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Weather')),
+      appBar: AppBar(title: Image.asset(
+        'la-meteo.png',
+        width: 50,
+        height: 50,
+      ),),
       body: Padding(
         padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 12),
         child: Center(
@@ -124,10 +112,9 @@ class _WeatherPageState extends State<WeatherPage> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
-                    print("E1");
                     return Center(child: Text('Error: ${snapshot.error}'));
                   } else if (snapshot.hasData) {
-                    // Affichage des informations météo centrées
+
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -225,7 +212,7 @@ class _WeatherPageState extends State<WeatherPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: TextFormField(
                   controller: _specificCountryController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Pays',
                     contentPadding:
                         EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
@@ -239,7 +226,7 @@ class _WeatherPageState extends State<WeatherPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 24.0),
                 child: TextFormField(
                   controller: _specificCityController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Ville',
                     contentPadding:
                         EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
